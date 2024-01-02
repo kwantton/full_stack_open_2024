@@ -8,14 +8,15 @@ sequenceDiagram
     participant server
 
 Note left of server: the browser submits the note (text/html) to the server
+
 browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
     activate server
+Note left of server: the server adds the note to notes together with the date, but does not save the new note to a database
     server-->>browser: HTTP Status 302 (="Found"): URL redirect for browser to GET "Location" (which is ".../exampleapp/notes")
     deactivate server
 
     browser->>server: GET ...exampleapp/notes (=get the HTML, the page from .../notes)
     activate server
-Note left of server: the browser adds the note to notes together with the date, but does not save the new note to a database
     server-->>browser: HTML document
     deactivate server
 
