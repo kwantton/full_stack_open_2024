@@ -1,4 +1,5 @@
 # Exercise 0.5: Single page app diagram
+- The part starting from GET ...exampleapp/notes is adapted from the course material (to get the full picture better)
 - source: [Course material](https://fullstackopen.com/en/part0/fundamentals_of_web_apps#single-page-app)
 
 ```mermaid
