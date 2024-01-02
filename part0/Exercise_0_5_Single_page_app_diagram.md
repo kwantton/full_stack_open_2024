@@ -1,5 +1,5 @@
 # Exercise 0.5: Single page app diagram
-- the base is adapted from the course material (to get the full picture better)
+- the base is adapted from the course material, as only the web site (/spa) and .js (spa.js) differ from the provided example
 - source: [Course material](https://fullstackopen.com/en/part0/fundamentals_of_web_apps#single-page-app)
 
 ```mermaid
