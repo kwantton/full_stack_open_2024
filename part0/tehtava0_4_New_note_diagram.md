@@ -7,7 +7,7 @@ sequenceDiagram
     participant browser
     participant server
 
-Note left of server: the browser submits the note (text/html) to the server
+Note right of browser: Note saved -> the browser submits the note (text/html) to the server
 
 browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
     activate server
