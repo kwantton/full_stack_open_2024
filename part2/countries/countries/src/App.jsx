@@ -35,6 +35,7 @@ const Weather = ({shownCountry, shownWeather, temp, iconUrlSnippet, wind}) => {
 
 const Candidates = ({candidateList, handleShowButtonClick}) => {
   console.log("hello from candidates! candidateList:", candidateList)
+  if (candidateList === null) {return ""}
   
   const countriesTableStyle={
     width:250
@@ -106,10 +107,11 @@ function App() {
   const[wind, setWind] = useState(0)
 
   const handleCountryChange = event => {
+    setMessage("") // on kivempi, että viesti häviää näkyvistä kirjoittamisen ajaksi. Tämä myös varmistaa resettauksen tilanteessa, jossa mennään "no matches found":ista tyhjään kenttään.
     console.log("value:",event.currentTarget.value)
     setSelectedCountry(event.currentTarget.value)
     setShownCountry(null) // ettei näytetä ikusesti
-    setHae(true) // lähdetään hakemaan sisältöä Countries-osastolla
+    setHae(!hae) // lähdetään hakemaan sisältöä Countries-osastolla. HUOM! Jos tähän laittaa true, niin vähemmän turhia uudelleenlatauksia - MUTTA tällöin ongelmaksi muodostuu tapaus, jossa kirjoitetaan jotain mikä ei matchaa ja heti perään poistetaan kaikki input-kentästä (hakukentästä); tällöin voidaan jäädä ikuisesti jumiin tilaan "no matches found"
   }
 
   const handleShowButtonClick = (officialName) => {
@@ -211,10 +213,11 @@ function App() {
       console.log("candidateList päivitetään sisällöllä filteredNames, joka on", filteredNames)
     } else { // if there are 0 matching names, reset stuff
       setMessage("no matches, please try another input")
+      setShownCountry(null)
       setFilteredNames([])
       setFilteredCountries([])
-      setShownCountry(null)
       setCandidateList([])
+      //setHae(!hae) // tällä lailla saadaan ekstraluuppi
     }
   }) //.then loppuu näihin
   
@@ -231,7 +234,6 @@ function App() {
         <Message message={message}/>
       </div>
       <div>
-        {/**<Countries selectedCountry={selectedCountry} allCountries={allCountries} setAllCountries={setAllCountries} message={message} setMessage={setMessage} filteredNames={filteredNames} setFilteredNames={setFilteredNames} hae={hae} setHae={setHae} filteredCountries={filteredCountries} setFilteredCountries={setFilteredCountries} shownCountry={shownCountry} setShownCountry={setShownCountry} candidateList={candidateList} setCandidateList={setCandidateList} haeKandit={haeKandit} setHaeKandit={setHaeKandit}/> */}
         <Candidates candidateList={candidateList} handleShowButtonClick={handleShowButtonClick}/>
         <Country shownCountry={shownCountry} country={shownCountry}/>
         <Weather shownCountry={shownCountry} shownWeather={shownWeather} temp={temperature} iconUrlSnippet={iconUrlSnippet} wind={wind}/>
