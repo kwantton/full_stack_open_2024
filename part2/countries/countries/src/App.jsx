@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import countryServices from './services/countryServices.js'
-import getWeather from './services/weatherServices'
+import weatherServices from './services/weatherServices'
 
 const Message = ({message}) => {
   return (
     <p>{message}</p>)
 }
 
-const Weather = ({shownCountry, shownWeather, temp}) => {
+const Weather = ({shownCountry, shownWeather, temp, iconUrlSnippet, wind}) => {
   
   if(shownCountry === null) {
     console.log("Weather: shownCountry === null, palataan")
@@ -21,10 +21,13 @@ const Weather = ({shownCountry, shownWeather, temp}) => {
   console.log(`hello from Weather(${(shownCountry.name.common)})!`)
   //return (<div>moro :D</div>)
   console.log("Weather: palautetaan shownWeather:", shownWeather)
+  console.log(`weatherServices.getIconUrl(iconUrlSnippet): ${weatherServices.getIconUrl(iconUrlSnippet)}`)
   return (
     <div>
       <h2> Weather in {shownCountry.capital}</h2>
-      <p>temperature {Math.round(temp)} Celcius</p>
+      <p>temperature {temp.toFixed(2)} Celcius</p>
+      <img src={`${weatherServices.getIconUrl(iconUrlSnippet)}`} alt="weather icon"/>
+      <p>wind {wind} m/s</p>
       {/**shownWeather*/} {/** this would say "moro" */}
     </div>
   )
@@ -98,7 +101,9 @@ function App() {
   const[shownCountry, setShownCountry] = useState(null)
   const[shownWeather, setShownWeather] = useState(null)
   const[candidateList, setCandidateList] = useState([])
-  const[temp, setTemp] = useState(0)
+  const[temperature, setTemperature] = useState(0)
+  const[iconUrlSnippet, setIconUrlSnippet] = useState("")
+  const[wind, setWind] = useState(0)
 
   const handleCountryChange = event => {
     console.log("value:",event.currentTarget.value)
@@ -114,6 +119,25 @@ function App() {
     console.log("matching country:", matchingCountry) // this is the country we wanna show c:
     //const countryToShow = <Country country={matchingCountry}/> // tehääs tästä state, joka näytetään
     setShownCountry(matchingCountry) 
+    
+    // TO-DO: update temp and icon
+    // COPY-PASTE below: from the situation where there is only 1 country in the results
+    const capital = matchingCountry.capital
+      const countryAbbreviationTwoLetters = matchingCountry.tld[0].substring(1)
+      weatherServices.getWeather(capital, countryAbbreviationTwoLetters)
+      .then(data => {
+        console.log("handleShowButtonClick: säädata:",data)
+        console.log("handleShowButtonClick: säädata.weather[0].icon:",data.weather[0].icon)
+        const iconUrlSnippet = data.weather[0].icon // the name of the icon
+        setIconUrlSnippet(iconUrlSnippet)  // so that Weather can GET the icon png
+
+        console.log("handleShowButtonClick: säädata.main.temp-273.15 =", data.main.temp-273.15)
+        setTemperature(data.main.temp-273.15)
+        setWind(data.wind.speed)
+        console.log("handleShowButtonClick: laitetaan moro:D shownWeatheriksi")    
+        setShownWeather("moro")
+      })
+      .catch(error => console.error("virhe Weather:in then:issä!:", error))
   }
   
   useEffect(() => { // ...}, [hae] // <- below: all of this is ONLY executed if hae changes. The "hae" is truthy only if input field value has just changed.
@@ -143,6 +167,7 @@ function App() {
       setMessage("Too many matches, specify another filter")
       setShownCountry(null)
       setCandidateList([])
+
     } else if (filteredMaat.length === 1) {
       let nimi = filteredMaat[0].name.official
       
@@ -151,17 +176,19 @@ function App() {
       setFilteredNames([nimi])
       setCandidateList([])
       setFilteredCountries([filteredMaat[0]])
-
-      //return ""
       
+      // weather part, when there's only 1 country:
       const capital = filteredMaat[0].capital
       const countryAbbreviationTwoLetters = filteredMaat[0].tld[0].substring(1)
-      getWeather(capital, countryAbbreviationTwoLetters)
+      weatherServices.getWeather(capital, countryAbbreviationTwoLetters)
       .then(data => {
         console.log("säädata:",data)
         console.log("säädata.weather[0].icon:",data.weather[0].icon)
-        console.log("säädata.main.temp-273.15", data.main.temp-273.15)
-        setTemp(data.main.temp-273.15)
+        console.log("säädata.main.temp-273.15 =", data.main.temp-273.15)
+        const iconUrlSnippet = data.weather[0].icon // the name of the icon
+        setIconUrlSnippet(iconUrlSnippet)  // so that Weather can GET the icon png
+        setTemperature(data.main.temp-273.15)
+        setWind(data.wind.speed)
         console.log("laitetaan moro:D shownWeatheriksi")    
         setShownWeather("moro")
       })
@@ -192,14 +219,7 @@ function App() {
   }) //.then loppuu näihin
   
   console.log("filteredNames:", filteredNames)
-   /**if (filteredCountries.length === 1) {
-    setCandidateList([]) // nollataan
-    
-      // "yksi vaan..."
-    console.log("löyty yks vaan:", filteredCountries[0])
-      setShownCountry(filteredCountries[0])
-    } */ // Redundant, done above already. If this is not removed, this is redundant -> you can see small flicker on the screen
-    setHae(false)  // tulee tehtyä tokankin kerran heti perään tämän ansiosta -> ehkä jopa päivittäiskin ajallaan? (koska useEffect, niin KAIKKI muutokset saavat aikaan uudelleenkutsumisen; sekä setHae(false) ETTÄ setHae(true)!)
+    setHae(false)  // tämä näköjään on pakollinen (koska useEffect, niin KAIKKI muutokset saavat aikaan uudelleenkutsumisen; sekä setHae(false) ETTÄ setHae(true)!)
     }, [hae]) // all of this is ONLY executed if(hae), which is truthy only if input field value has just changed. // if(hae) loppuu tähän!
     
   return (
@@ -214,7 +234,7 @@ function App() {
         {/**<Countries selectedCountry={selectedCountry} allCountries={allCountries} setAllCountries={setAllCountries} message={message} setMessage={setMessage} filteredNames={filteredNames} setFilteredNames={setFilteredNames} hae={hae} setHae={setHae} filteredCountries={filteredCountries} setFilteredCountries={setFilteredCountries} shownCountry={shownCountry} setShownCountry={setShownCountry} candidateList={candidateList} setCandidateList={setCandidateList} haeKandit={haeKandit} setHaeKandit={setHaeKandit}/> */}
         <Candidates candidateList={candidateList} handleShowButtonClick={handleShowButtonClick}/>
         <Country shownCountry={shownCountry} country={shownCountry}/>
-        <Weather shownCountry={shownCountry} shownWeather={shownWeather} temp={temp}/>
+        <Weather shownCountry={shownCountry} shownWeather={shownWeather} temp={temperature} iconUrlSnippet={iconUrlSnippet} wind={wind}/>
       </div>
     </>
   )
