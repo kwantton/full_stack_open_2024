@@ -7,19 +7,27 @@ const Message = ({message}) => {
     <p>{message}</p>)
 }
 
-/*useEffect (() => {
+const Weather = ({shownCountry, shownWeather, temp}) => {
+  
+  if(shownCountry === null) {
+    console.log("Weather: shownCountry === null, palataan")
+    return ""}
+  
+  if(shownWeather === null) {
+    console.log("Weather: shownWeather === null, palataan")
+    return ""
+  }
 
-}) */
-const Weather = ({shownCountry, shownWeather, setShownWeather}) => {
-  if(shownCountry === null) {return ""}
-  return ""
   console.log(`hello from Weather(${(shownCountry.name.common)})!`)
-  const capital = shownCountry.capital
-  const countryAbbreviationTwoLetters = shownCountry.tld[0].substring(1)
-  getWeather(capital,countryAbbreviationTwoLetters)
-  .then(data => {
-    console.log("säädata:",data)
-  })
+  //return (<div>moro :D</div>)
+  console.log("Weather: palautetaan shownWeather:", shownWeather)
+  return (
+    <div>
+      <h2> Weather in {shownCountry.capital}</h2>
+      <p>temperature {Math.round(temp)} Celcius</p>
+      {/**shownWeather*/} {/** this would say "moro" */}
+    </div>
+  )
 }
 
 const Candidates = ({candidateList, handleShowButtonClick}) => {
@@ -69,7 +77,7 @@ const Country = ({country, shownCountry}) => {
         </tbody>
       </table>
 
-      <h3>languages:</h3>
+      <h3>languages</h3>
       <ul>
         {languages.map(language => 
         <li>{language}</li>)}
@@ -90,6 +98,7 @@ function App() {
   const[shownCountry, setShownCountry] = useState(null)
   const[shownWeather, setShownWeather] = useState(null)
   const[candidateList, setCandidateList] = useState([])
+  const[temp, setTemp] = useState(0)
 
   const handleCountryChange = event => {
     console.log("value:",event.currentTarget.value)
@@ -142,6 +151,23 @@ function App() {
       setFilteredNames([nimi])
       setCandidateList([])
       setFilteredCountries([filteredMaat[0]])
+
+      //return ""
+      
+      const capital = filteredMaat[0].capital
+      const countryAbbreviationTwoLetters = filteredMaat[0].tld[0].substring(1)
+      getWeather(capital, countryAbbreviationTwoLetters)
+      .then(data => {
+        console.log("säädata:",data)
+        console.log("säädata.weather[0].icon:",data.weather[0].icon)
+        console.log("säädata.main.temp-273.15", data.main.temp-273.15)
+        setTemp(data.main.temp-273.15)
+        console.log("laitetaan moro:D shownWeatheriksi")    
+        setShownWeather("moro")
+      })
+      .catch(error => console.error("virhe Weather:in then:issä!:", error))
+    
+
     } else if (filteredMaat.length > 1) { // jos nimiä on 2-10:
       
       setMessage("")
@@ -166,16 +192,16 @@ function App() {
   }) //.then loppuu näihin
   
   console.log("filteredNames:", filteredNames)
-   if (filteredCountries.length === 1) {
+   /**if (filteredCountries.length === 1) {
     setCandidateList([]) // nollataan
     
       // "yksi vaan..."
     console.log("löyty yks vaan:", filteredCountries[0])
       setShownCountry(filteredCountries[0])
-    } 
+    } */ // Redundant, done above already. If this is not removed, this is redundant -> you can see small flicker on the screen
     setHae(false)  // tulee tehtyä tokankin kerran heti perään tämän ansiosta -> ehkä jopa päivittäiskin ajallaan? (koska useEffect, niin KAIKKI muutokset saavat aikaan uudelleenkutsumisen; sekä setHae(false) ETTÄ setHae(true)!)
     }, [hae]) // all of this is ONLY executed if(hae), which is truthy only if input field value has just changed. // if(hae) loppuu tähän!
-
+    
   return (
     <>
       <div>
@@ -188,7 +214,7 @@ function App() {
         {/**<Countries selectedCountry={selectedCountry} allCountries={allCountries} setAllCountries={setAllCountries} message={message} setMessage={setMessage} filteredNames={filteredNames} setFilteredNames={setFilteredNames} hae={hae} setHae={setHae} filteredCountries={filteredCountries} setFilteredCountries={setFilteredCountries} shownCountry={shownCountry} setShownCountry={setShownCountry} candidateList={candidateList} setCandidateList={setCandidateList} haeKandit={haeKandit} setHaeKandit={setHaeKandit}/> */}
         <Candidates candidateList={candidateList} handleShowButtonClick={handleShowButtonClick}/>
         <Country shownCountry={shownCountry} country={shownCountry}/>
-        <Weather shownCountry={shownCountry} shownWeather={shownWeather} setShownWeather={setShownWeather}/>
+        <Weather shownCountry={shownCountry} shownWeather={shownWeather} temp={temp}/>
       </div>
     </>
   )
