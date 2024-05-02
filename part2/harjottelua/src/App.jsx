@@ -5,7 +5,7 @@ import Notification from './components/Notification.jsx'
 import Footer from './components/Footer.jsx'
 
 const App = () => {
-  const [notes, setNotes] = useState([])
+  const [notes, setNotes] = useState(null) // HUOM! Tämä takia, huomaa rivin ~~19 "if(!notes) {return null}" joka varmistaa, että App:in käynnistäessä ekalla kertaa palautetaan null, ja vasta kun notes on haettu serveriltä (?), alkaa toimimaan; palautetaan null App:ista, kunnes serveriltä on saatu data. HUOM! "The method based on conditional rendering is suitable in cases where it is impossible to define the state so that the initial rendering is possible." Eli mitään oikeaa syytä initata notes "null":iksi ei ole; paljon mieluummin inittaa []:ksi, jolloin tätä ongelmaa ei ole!! (ongelma: null:ille ei voi kutsua .map:iä. TAI, joutuisit joka kohdassa tarkistamaan ?.map jne... paskempi vaihtoehto)
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(false) // tähän true -> kaikki näytetään by default; false -> näytetään vain tärkeät by default c:
   const [errorMessage, setErrorMessage] = useState('Default error message!')
@@ -16,6 +16,9 @@ const App = () => {
       setNotes(initialNotes)
     }) 
   }, []) // without the [] as 2nd argument, it would keep rendering them FOREVER! Thanks to the [], it will only render them ONCE c:
+  if(!notes) { 
+    return null
+  }
   console.log('render', notes.length, 'notes')
 
   const addNote = (event) => {
@@ -74,7 +77,8 @@ const App = () => {
         </button>      
       </div>
       <ul>
-      {notesToShow.map(note => 
+      {notesToShow.map(note =>
+         
           <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)}/>
         )}
       </ul>
