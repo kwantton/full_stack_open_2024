@@ -88,12 +88,12 @@ const Country = ({country, shownCountry}) => {
       <p></p> {/** some space c: */}
       <img src={`${country.flags.svg}`} width={200} height={"auto"}/>
     </div>
-  ) // testi
+  )
 }
 
 function App() {
   const[selectedCountry, setSelectedCountry] = useState('')
-  const[allCountries, setAllCountries] = useState([])
+  const[allCountries, setAllCountries] = useState([]) // the dream was to save all data here after the first fetch, but I didn't do that. This should be done IRL to conserve resources and improve performance.
   const[hae, setHae] = useState(false) // jos tämän laittaa default true, hakee noin 1500 kertaa ennen kuin edes osaa päivittää itsensä falseksi... huokaus
   const[message, setMessage] = useState("")
   const[filteredNames, setFilteredNames] = useState([])
@@ -120,8 +120,8 @@ function App() {
     //const countryToShow = <Country country={matchingCountry}/> // tehääs tästä state, joka näytetään
     setShownCountry(matchingCountry) 
     
-    // TO-DO: update temp and icon
-    // COPY-PASTE below: from the situation where there is only 1 country in the results
+    // update temp and icon
+    // COPY-PASTE from the situation where there is only 1 country in the results, further below
     const capital = matchingCountry.capital
       const countryAbbreviationTwoLetters = matchingCountry.tld[0].substring(1)
       weatherServices.getWeather(capital, countryAbbreviationTwoLetters)
@@ -140,7 +140,7 @@ function App() {
       .catch(error => console.error("virhe Weather:in then:issä!:", error))
   }
   
-  useEffect(() => { // ...}, [hae] // <- below: all of this is ONLY executed if hae changes. The "hae" is truthy only if input field value has just changed.
+  useEffect(() => { // ...}, [hae] //  < waaaaay below: all of this is ONLY executed if state variable "hae" changes. The "hae" is truthy only if input field value has just changed, but that doesn't really matter (truthy vs. falsy doesn't matter anymore).
   countryServices.getAll()
   .then(data => {
     console.log("countryServices.getAll().then(data => data[0]):", data[0])
@@ -209,7 +209,7 @@ function App() {
       
       console.log("suodatettujen tulosten (alle 10!) nimet:", nimet)
       console.log("candidateList päivitetään sisällöllä filteredNames, joka on", filteredNames)
-    } else {
+    } else { // if there are 0 matching names, reset stuff
       setMessage("no matches, please try another input")
       setFilteredNames([])
       setFilteredCountries([])

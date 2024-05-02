@@ -16,9 +16,4 @@ const getOne = country => {
   .then(response => response.data) // returns a promise with JUST the data
 }
 
-/*const update = (id, newObject) => {
-  return axios.put(`${baseUrl}/${id}`, newObject)
-  .then(response => response.data) // returns a promise with JUST the data
-} */
-
 export default { getAll, getOne} // object!
