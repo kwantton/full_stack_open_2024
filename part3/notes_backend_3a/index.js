@@ -5,6 +5,8 @@ app.use(express.json())
 const cors = require('cors') // not very safe!! This allows for CORS from all URLs!
 app.use(cors())
 
+app.use(express.static('dist')) // NEEDED FOR SERVING STATIC FILES FROM THE BACKEND https://fullstackopen.com/en/part3/deploying_app_to_internet 
+
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
@@ -95,6 +97,7 @@ app.post('/api/notes', (request, response) => {
   response.json(note)
 })
 
-const PORT = process.env.PORT || 3001 // environment variable PORT, OR 3001 if env.var.PORT is not defined
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+const PORT = process.env.PORT || 3001; // environment variable PORT, OR 3001 if env.var.PORT is not defined
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
