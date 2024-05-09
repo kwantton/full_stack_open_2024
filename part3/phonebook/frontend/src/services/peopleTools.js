@@ -1,6 +1,6 @@
-// TO-DO: use more
+
 import axios from "axios"
-const baseURL = "http://localhost:3001/persons"
+const baseURL = "http://localhost:3001/api/persons" // this was modified to /api/persons for the backend c: - just /persons would work with the json-server, but that's not used in the version deployed to Internet
 
 const getAll = () => {
     return axios.get(baseURL).then(response => response.data)
